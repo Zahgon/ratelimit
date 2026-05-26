@@ -22,8 +22,6 @@ package ratelimit // import "go.uber.org/ratelimit"
 
 import (
 	"time"
-
-	"github.com/benbjohnson/clock"
 )
 
 // Note: This file is inspired by:
@@ -53,23 +51,10 @@ type config struct {
 }
 
 // New returns a Limiter that will limit to the given RPS.
-func New(rate int, opts ...Option) Limiter {
-	return newAtomicInt64Based(rate, opts...)
-}
+func New(rate int, opts ...Option) Limiter { _ = "STUB: not implemented"; return *new(Limiter) }
 
 // buildConfig combines defaults with options.
-func buildConfig(opts []Option) config {
-	c := config{
-		clock: clock.New(),
-		slack: 10,
-		per:   time.Second,
-	}
-
-	for _, opt := range opts {
-		opt.apply(&c)
-	}
-	return c
-}
+func buildConfig(opts []Option) config { _ = "STUB: not implemented"; return *new(config) }
 
 // Option configures a Limiter.
 type Option interface {
@@ -81,37 +66,35 @@ type clockOption struct {
 }
 
 func (o clockOption) apply(c *config) {
-	c.clock = o.clock
+	_ = "STUB: not implemented"
+
+	// WithClock returns an option for ratelimit.New that provides an alternate
+	// Clock implementation, typically a mock Clock for testing.
+	return
 }
 
-// WithClock returns an option for ratelimit.New that provides an alternate
-// Clock implementation, typically a mock Clock for testing.
-func WithClock(clock Clock) Option {
-	return clockOption{clock: clock}
-}
+func WithClock(clock Clock) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 type slackOption int
 
 func (o slackOption) apply(c *config) {
-	c.slack = int(o)
+	_ = "STUB: not implemented"
+
+	// WithoutSlack configures the limiter to be strict and not to accumulate
+	// previously "unspent" requests for future bursts of traffic.
+	return
 }
 
-// WithoutSlack configures the limiter to be strict and not to accumulate
-// previously "unspent" requests for future bursts of traffic.
 var WithoutSlack Option = slackOption(0)
 
 // WithSlack configures custom slack.
 // Slack allows the limiter to accumulate "unspent" requests
 // for future bursts of traffic.
-func WithSlack(slack int) Option {
-	return slackOption(slack)
-}
+func WithSlack(slack int) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 type perOption time.Duration
 
-func (p perOption) apply(c *config) {
-	c.per = time.Duration(p)
-}
+func (p perOption) apply(c *config) { _ = "STUB: not implemented"; return }
 
 // Per allows configuring limits for different time windows.
 //
@@ -119,17 +102,11 @@ func (p perOption) apply(c *config) {
 // second (100 Hz) rate limiter.
 //
 // New(2, Per(60*time.Second)) creates a 2 per minute rate limiter.
-func Per(per time.Duration) Option {
-	return perOption(per)
-}
+func Per(per time.Duration) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 type unlimited struct{}
 
 // NewUnlimited returns a RateLimiter that is not limited.
-func NewUnlimited() Limiter {
-	return unlimited{}
-}
+func NewUnlimited() Limiter { _ = "STUB: not implemented"; return *new(Limiter) }
 
-func (unlimited) Take() time.Time {
-	return time.Now()
-}
+func (unlimited) Take() time.Time { _ = "STUB: not implemented"; return *new(time.Time) }

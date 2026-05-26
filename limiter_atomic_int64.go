@@ -21,7 +21,6 @@
 package ratelimit // import "go.uber.org/ratelimit"
 
 import (
-	"sync/atomic"
 	"time"
 )
 
@@ -40,53 +39,21 @@ type atomicInt64Limiter struct {
 
 // newAtomicBased returns a new atomic based limiter.
 func newAtomicInt64Based(rate int, opts ...Option) *atomicInt64Limiter {
+	_ = "STUB: not implemented"
 	// TODO consider moving config building to the implementation
 	// independent code.
-	config := buildConfig(opts)
-	perRequest := config.per / time.Duration(rate)
-	l := &atomicInt64Limiter{
-		perRequest: perRequest,
-		maxSlack:   time.Duration(config.slack) * perRequest,
-		clock:      config.clock,
-	}
-	atomic.StoreInt64(&l.state, 0)
-	return l
+	return nil
 }
 
 // Take blocks to ensure that the time spent between multiple
 // Take calls is on average time.Second/rate.
-func (t *atomicInt64Limiter) Take() time.Time {
-	var (
-		newTimeOfNextPermissionIssue int64
-		now                          int64
-	)
-	for {
-		now = t.clock.Now().UnixNano()
-		timeOfNextPermissionIssue := atomic.LoadInt64(&t.state)
+func (t *atomicInt64Limiter) Take() time.Time { _ = "STUB: not implemented"; return *new(time.Time) }
 
-		switch {
-		case timeOfNextPermissionIssue == 0 || (t.maxSlack == 0 && now-timeOfNextPermissionIssue > int64(t.perRequest)):
-			// if this is our first call or t.maxSlack == 0 we need to shrink issue time to now
-			newTimeOfNextPermissionIssue = now
-		case t.maxSlack > 0 && now-timeOfNextPermissionIssue > int64(t.maxSlack)+int64(t.perRequest):
-			// a lot of nanoseconds passed since the last Take call
-			// we will limit max accumulated time to maxSlack
-			newTimeOfNextPermissionIssue = now - int64(t.maxSlack)
-		default:
-			// calculate the time at which our permission was issued
-			newTimeOfNextPermissionIssue = timeOfNextPermissionIssue + int64(t.perRequest)
-		}
+// if this is our first call or t.maxSlack == 0 we need to shrink issue time to now
 
-		if atomic.CompareAndSwapInt64(&t.state, timeOfNextPermissionIssue, newTimeOfNextPermissionIssue) {
-			break
-		}
-	}
+// a lot of nanoseconds passed since the last Take call
+// we will limit max accumulated time to maxSlack
 
-	sleepDuration := time.Duration(newTimeOfNextPermissionIssue - now)
-	if sleepDuration > 0 {
-		t.clock.Sleep(sleepDuration)
-		return time.Unix(0, newTimeOfNextPermissionIssue)
-	}
-	// return now if we don't sleep as atomicLimiter does
-	return time.Unix(0, now)
-}
+// calculate the time at which our permission was issued
+
+// return now if we don't sleep as atomicLimiter does
